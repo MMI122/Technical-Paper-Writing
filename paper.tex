@@ -301,6 +301,112 @@ The intuitive idea here is that suppose we are solving a problem and writing cod
 	}
  \end{lstlisting}
 InCoder basically sees the problem, loop, and context and then tries to guess what should be inside. 
+Suppose we have a code snippet:
+\begin{lstlisting}
+def add(a, b):
+	return a + b
+\end{lstlisting}
+
+Suppose we are trying to mask:
+\begin{itemize}
+\item Left context: \texttt{def add (a, b):}
+\item Right context: \texttt{`` ''}
+\item Span = \texttt{return a + b}
+\end{itemize}
+
+\noindent\textbf{Training Objective~\cite{fried2023incodergenerativemodelcode}}
+\begin{equation}
+\log P\left([
+\text{Left};\langle \text{Mask:0} \rangle;
+\text{Right};\langle \text{Mask:0} \rangle;
+\text{Span};\langle \text{EOM} \rangle
+]\right)
+\end{equation}
+
+Code snippet:
+\begin{lstlisting}
+def add(a, b):
+	<MASK>
+<MASK> return a + b <EOM>
+\end{lstlisting}
+Here first \verb|<MASK>| means that something is missing. Then the second \verb|<MASK>| means that generate the code in the middle. And lastly \verb|<EOM>| means that the code is ended.So the model here is learning that there is code at both let and right and trying to predict the missing span. It is kind of learning substring reconstruction problem.
+
+\noindent\textbf{Inference (Real Use)~\cite{fried2023incodergenerativemodelcode}}
+\begin{equation}
+P\left(\cdot \mid [
+\text{Left};\langle \text{Mask:0} \rangle;
+\text{Right};\langle \text{Mask:0} \rangle
+]\right)
+\end{equation}
+Code snippet:
+\begin{lstlisting}
+def add(a, b):
+	<MASK>
+\end{lstlisting}
+Model internally takes it as Left + Mask + Right + Mask
+Then it generates the code in the middle and gives the output as:
+\begin{lstlisting}
+	return a + b	
+\end{lstlisting}
+Full Flow:
+Training time:
+Original code $\rightarrow$ mask $\rightarrow$ move span to end $\rightarrow$ train
+Inference time:
+Give code with \verb|<MASK>| $\rightarrow$ model generates the missing part
+
+Example (Multi-region):
+\begin{lstlisting}
+def process(x):
+	<MASK1>
+	y = x * 2
+	<MASK2>
+\end{lstlisting}
+Here the model can fill:
+\begin{lstlisting}
+<MASK1> print(x)
+<MASK2> return y
+\end{lstlisting}
+
+In the previous models:
+\begin{equation}
+P(\text{token} \mid \text{previous tokens})
+\end{equation}
+In InCoder:
+\begin{equation}
+P(\text{token} \mid \text{left context} + \text{right context})
+\end{equation}
+It basically means that it is not sequence to sequence. Rather it is autoregressive model plus smart training trick. So it means that it is not architectural change. Only the training objective is changed here.
+All GPT-based models learn like~\cite{fried2023incodergenerativemodelcode}:
+\begin{equation}
+P(x_1, x_2, x_3, \ldots, x_n) = \prod_{i=1}^{n} P(x_i \mid x_1 \ldots x_{i-1})
+\end{equation}
+Here every token learns to predict from the before tokens.
+Example:
+\begin{lstlisting}
+def max(a, b):
+	if a > b:
+		return a
+	else:
+		return b
+\end{lstlisting}
+Now:
+\begin{lstlisting}
+def max(a, b):
+	<MASK>
+	if a > b:
+		return a
+	else:
+		return b
+\end{lstlisting}
+Heere the model would have the context of \texttt{if a > b:} and it does not know \texttt{else: return b}. So it may guess \texttt{return a}. But it is just a lucky guess, not properly context based. But in InCoder, it would have those contexts and it would be able to generate the code in the middle with much more accuracy. 
+\subsubsection{Model Architecture Overview}
+The GPT-based architecture model used to see the left context and it would not be able to fill in the middle with much more accuracy. But in Incoder, these things are fixed more or less.
+\begin{itemize}
+	\item \textbf{Masking the Random Span}
+	\item \textbf{Moving the Masked Span to the End}
+	\item \textbf{Training the Model to Predict the Masked Span}
+\end{itemize}
+
 
 
 

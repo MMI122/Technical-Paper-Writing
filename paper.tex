@@ -7,6 +7,7 @@
 \usepackage{cite}
 \usepackage{xcolor}
 \usepackage{listings}
+\usepackage{forest}
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{float}
@@ -406,6 +407,238 @@ The GPT-based architecture model used to see the left context and it would not b
 	\item \textbf{Moving the Masked Span to the End}
 	\item \textbf{Training the Model to Predict the Masked Span}
 \end{itemize}
+\section{StructCoder: Structure-aware Code Generation}
+In the transformer-based models, the main problem is that they used to see the code as text. But in reality, the code has its syntax and also the semantics (meaning).
+\begin{lstlisting}
+a = 5
+b = a + 2
+\end{lstlisting}
+Here the syntax has to be alright and also the semantics here would be that b is dependent on a. So StructCoder says that code is just not a natural language. Rather the code is a combination of Structure, Dataflow and Syntax. They mainly used two things:
+\begin{itemize}
+	\item \textbf{Abstract Syntax Tree (AST)}: It is the structure tree of the code.
+	\begin{lstlisting}
+		a = b + c
+	\end{lstlisting}
+	\begin{center}
+	\begin{forest}
+	for tree={
+		draw,
+		rounded corners,
+		minimum height=9mm,
+		minimum width=9mm,
+		inner sep=2pt,
+		s sep=10mm,
+		l sep=10mm,
+		font=\ttfamily\bfseries
+	}
+	[{$=$}
+		[a]
+		[+
+			[b]
+			[c]
+		]
+	]
+	\end{forest}
+	\end{center}
+	It says which one is operator and which one is variable.
+	
+	\item \textbf{Dataflow Graph}: 
+	It says which variable is taking value from which variable. Example:
+	\begin{lstlisting}
+a = 5
+b = a + 2
+	\end{lstlisting}
+Here the dataflow graph would be:
+a $\rightarrow$ b
+\end{itemize}
+StructCoder Architecture:
+Structcoder = Encoder + Decoder (Transformer-based)
+\begin{itemize}
+	\item \textbf{Encoder}: It can understand input. The StructCoder encoder uses AST and DFG and Special attention mechanism to understand the structure of the code. It can understand the syntax and semantics of the code.
+	\item \textbf{Decoder}: Decoder generates output. Before the decoder used to just predict the next token. But in StructCoder, the decoder is given two extra tasks:
+	\item \textbf{AST Path Prediction}: The model is trained to predict the output code's AST path. So it learns the structure of the code.
+	\begin{lstlisting}
+		a = b + c
+	\end{lstlisting}
+	Here model doesn't just predict the code, it also predicts the AST path. 
+	\item \textbf{Dataflow Prediction}: Model learns which variable depends on which one.
+	\begin{lstlisting}
+		b = a + 2
+	\end{lstlisting}
+	The model can understand a $\rightarrow$ b
+
+\end{itemize}
+
+\noindent\textbf{Pre-training Strategy:}
+StructCoder uses Denoising Autoencoder (DAE) as the pre-training strategy. What it does:
+\noindent Code + AST + DFG $\rightarrow$ it is corrupted.\\
+\noindent Then it is asked to the model to recover the original code.
+Example:
+\begin{lstlisting}
+	a = b + c
+\end{lstlisting}
+After Corruption:
+\begin{lstlisting}
+	a = __ + c
+\end{lstlisting}
+Then the model would fill it with b.
+\subsection{Structure-Aware Encoder}
+
+The structure-aware encoder treats code as more than a simple token sequence. For plain text input, the model can rely only on the surface tokens. When we take code input, it uses the code tokens together with structural information from the AST and DFG.This design follows StructCoder~\cite{10.1145/3636430} and here it allows the code not only to take the lexical form of the program but also to understand the syntax and semantics through the AST and DFG representations. 
+
+\paragraph{Input representation}
+For a code example, the encoder input can be written as follows, following StructCoder~\cite{10.1145/3636430}:
+\begin{equation}
+\mathbf{x} = [\mathrm{CLS}, s_1, s_2, \ldots, s_{|S|}, \mathrm{SEP}, l_1, l_2, \ldots, l_{|L|}, v_1, v_2, \ldots, v_{|V|}],
+\end{equation}
+where $s_i$ denotes the code tokens, $l_i$ denotes AST leaves, and $v_i$ denotes variables from the DFG.\@ In practice, this means that the encoder can combine token-level information with tree-level and graph-level structure.
+
+For example, the statement \texttt{a = b + c} can be represented by the token sequence for the code itself, while the AST and DFG provide additional structure. In a text-only scenario, the model can ignore AST and DFG signals. But in a code scenario, the full structural input is used.
+
+\paragraph{Input embeddings}
+All three input types are mapped into the same vector space. Code tokens use a standard embedding lookup, DFG variables are assigned variable-specific embeddings, and AST leaf embeddings are built from the path between the root and the leaf. StructCoder~\cite{10.1145/3636430} defines the leaf embedding for a leaf node $l$ as
+\begin{equation}
+E(l) = \sum_{i=1}^{|l|} E_{\mathrm{type}}(r_i.\mathrm{type}) \odot E_{\mathrm{height}}(|l|-i),
+\end{equation}
+where $r_i$ is the $i$-th node on the path from the root to the leaf. The type embedding captures the node label, while the height embedding helps the model understand the position of the node inside the tree. As a result, the model can learn to recognize patterns in the AST structure.
+
+\paragraph{Structure-aware self-attention}
+The encoder then applies different attention patterns based on the type of relationship being modeled, again following StructCoder~\cite{10.1145/3636430}.
+
+\begin{itemize}
+	\item \textbf{Code-to-code attention}: this is the standard token-to-token attention used in transformer models, with relative position information added to preserve order, as described in StructCoder~\cite{10.1145/3636430}.
+	\begin{equation}
+	A(s_i, s_j) = E_{s_i}^{\top} W_q^{\top} W_k E_{s_j} + \phi(|i-j|).
+	\end{equation}
+	Meaning:
+	Standard T5 attention. The relative position function $\phi$ helps the model understand the order of tokens, which is crucial for code where the sequence matters.
+
+
+	\item \textbf{Leaf-to-leaf attention}: this attention compares two AST leaves by how much tree context they share. Two leaves that lie on a longer common path are treated as more closely related in StructCoder~\cite{10.1145/3636430}.
+	\begin{equation}
+	\operatorname{sim}(l_i, l_j) = \log\!\left(1 + \frac{\sum_{k=1}^{\min(|l_i|,|l_j|)} \mathbb{1}(r_k^i = r_k^j)}{|l_i||l_j|}\right).
+	\end{equation}
+	The final attention score combines the learned similarity with the normal dot-product attention:
+	\begin{equation}
+	A(l_i, l_j) = E_{l_i}^{\top} W_q^{\top} W_k E_{l_j} + \bigl(w_a \cdot \operatorname{sim}(l_i, l_j) + w_b\bigr).
+	\end{equation}
+	So here it is not based on the position rather is based on the similarity.
+	Example:
+	\begin{lstlisting}
+		= -> + -> b
+		= -> + -> c
+	\end{lstlisting}
+	Here the two leaves \texttt{b} and \texttt{c} share a common path through the AST, so they would have higher attention between them than two leaves that do not share as much structure.
+
+	\item \textbf{Variable-to-variable attention}: in the DFG, attention is allowed only between variables that are connected by a dependency edge, following StructCoder~\cite{10.1145/3636430}.
+	\begin{equation}
+	A(v_i, v_j) =
+	\begin{cases}
+	E_{v_i}^{\top} W_q^{\top} W_k E_{v_j}, & D_{ij} = 1, \\
+	-\infty, & \text{otherwise}.
+	\end{cases}
+	\end{equation}
+	Meaning:
+	Only connected variables get the attention here. 
+	Example:
+	\begin{lstlisting}
+		b = a + 2
+	\end{lstlisting}
+	Allowed: 
+	\begin{lstlisting}
+		a <-> b
+	\end{lstlisting}
+	Not Allowed: 
+	\begin{lstlisting}
+		a <-> unrelated variable
+	\end{lstlisting}
+
+	\item \textbf{Code-to-leaf and code-to-variable attention}: these cross-type links connect code tokens with the AST leaves and DFG variables that correspond to them, following StructCoder~\cite{10.1145/3636430}.
+	\begin{equation}
+	A(s_i, l_j) =
+	\begin{cases}
+	E_{s_i}^{\top} W_q^{\top} W_k E_{l_j}, & L^{ast}_{ij} = 1, \\
+	-\infty, & \text{otherwise}.
+	\end{cases}
+	\end{equation}
+\end{itemize}
+Meaning:
+token $\rightarrow$ leaf: if the token corresponds to an AST leaf, then it can attend to that leaf.
+Example:
+\begin{lstlisting}
+	a = b + c
+\end{lstlisting}
+Links:
+\begin{lstlisting}
+	a <-> leaf(a)
+	b <-> leaf(b)
+\end{lstlisting}
+
+This design gives the encoder a more complete view of the program.\@ Rather than treating the code as a flat sequence of tokens, the model can understand the hierarchical structure of the code through the AST and the dataflow through the DFG.\@ With this attention mechanism, the model can learn to recognize patterns in the code structure.
+\subsection{Structure-Aware Decoder}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{structdecoder.png}
+\caption{Structure-aware decoder generates the next token in the target code and predicts the node types on the root-to-leaf path to the leaf containing this token in the target AST as well as the DFG edges incident on this token~\cite{10.1145/3636430}.}\label{fig:structcoder_decoder}
+\end{figure}
+In normal decoder, it just predicts the next token. But in Structcoder, the decoder does predict next token, ast path and also DFG relations. So it learns the syntax and semantics together.
+
+The interesting thing here is that the output token is not increasing here, rather it is doing extra tasks which helps it in training time. So in inference time, it gets more awareness and prediction becomes better.
+
+\paragraph{Three training tasks}
+StructCoder trains the decoder with three complementary objectives:
+\begin{itemize}
+	\item \textbf{LM}: next-token prediction.
+	\item \textbf{APP}: AST path prediction.
+	\item \textbf{DFP}: dataflow prediction.
+\end{itemize}
+
+The language modeling head is the familiar decoder objective. For a hidden state $h_i$, the probability of the next token is computed as StructCoder~\cite{10.1145/3636430}:
+\begin{equation}
+p_i = \operatorname{softmax}(W h_i).
+\end{equation}
+This is the usual transformer-style prediction step: the model takes the hidden representation and turns it into a distribution over the vocabulary. The corresponding loss is also defined in StructCoder~\cite{10.1145/3636430}:
+\begin{equation}
+L_{lm} = -\frac{1}{|T|} \sum_{i=1}^{|T|} \log p_i(t_i).
+\end{equation}
+This part is actually same as the standard language modeling. So it just ensures that the model learns to generate the correct token sequence overall.
+
+The AST path prediction head is what makes the decoder syntax-aware. For every token, it predicts root$\rightarrow$ leaf path. \@ If we take the example \texttt{return a + b}, then the token \texttt{b} is not just a token by itself; it also sits somewhere in the tree, for example along a path like \texttt{=} $\rightarrow$ \texttt{+} $\rightarrow$ \texttt{b}. The decoder learns to recover that path. Formally, the path-level prediction is written as StructCoder~\cite{10.1145/3636430}:
+\begin{equation}
+p^{ast}_{ik} = \operatorname{softmax}\!\left(W^{( |l_i|-k )}_{ast} h_i\right).
+\end{equation}
+Here the model predicts the $k$-th node on the path for token $i$. The loss for this task is defined in StructCoder~\cite{10.1145/3636430}:
+\begin{equation}
+L_{app} = -\frac{1}{|T|} \sum_{i=1}^{|T|} \sum_{k=1}^{|l_i|} \log p^{ast}_{ik}(r_k^i.\mathrm{type}).
+\end{equation}
+In intuitive words, here the model learns where to place which token in tree. So it results in syntax-aware generation.
+
+The third task is dataflow prediction. Here model gets to understand the semantic relationships. For every pair of tokens $(i, j)$, the decoder predicts if there is a dataflow link from token $j$ to token $i$. For example, in \texttt{a = b + c}, both \texttt{b} and \texttt{c} influence \texttt{a}. So the model should learn that \texttt{b $\rightarrow$ a} and \texttt{c $\rightarrow$ a}. StructCoder models this relation as
+\begin{equation}
+p^{dfg}_{ij} = \sigma\!\left(h_i^{\top} U_{dfg}^{\top} V_{dfg} h_j + u_{dfg}^{\top} h_i + v_{dfg}^{\top} h_j + w_{dfg}\right).
+\end{equation}
+The sigmoid makes the result a probability, so the model can decide whether the edge exists or not. It also impiles that direction matters. The corresponding binary cross-entropy loss is also from StructCoder~\cite{10.1145/3636430}:
+\begin{equation}
+L_{dfp} = -\frac{1}{|T|^2} \sum_{i=1}^{|T|} \sum_{j=1}^{|T|} \Big[y_{ij} \log p^{dfg}_{ij} + (1-y_{ij}) \log(1-p^{dfg}_{ij})\Big].
+\end{equation}
+It eventually helps in semantic-aware generation.
+
+\paragraph{Final objective}
+StructCoder combines the three losses into one final objective~\cite{10.1145/3636430}:
+\begin{equation}
+L = L_{lm} + \alpha_1 L_{app} + \alpha_2 L_{dfp}.
+\end{equation}
+Here $L_{lm}$ controls token correctness, $L_{app}$ controls syntax correctness, and $L_{dfp}$ controls semantic correctness. The weights $\alpha_1$ and $\alpha_2$ balance how much the syntax and dataflow tasks matter during training. So the decoder is still generating code normally, but it learns from AST and DFG supervision at the same time~\cite{10.1145/3636430}.
+
+For example, if the model sees \texttt{a = b + c}, the language modeling head learns to generate the token sequence, the AST path head learns the tree structure of each token, and the DFG head learns that \texttt{b} and \texttt{c} flow into \texttt{a}. It is the core idea behind this Structure-aware decoder.
+
+
+
+
+
+
+
 
 
 

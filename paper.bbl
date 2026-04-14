@@ -52,4 +52,28 @@ A.~Vaswani, N.~Shazeer, N.~Parmar, J.~Uszkoreit, L.~Jones, A.~N. Gomez,
   Available: \url{https://arxiv.org/abs/1706.03762}
 \BIBentrySTDinterwordspacing
 
+\bibitem{feng2020codebertpretrainedmodelprogramming}
+\BIBentryALTinterwordspacing
+Z.~Feng, D.~Guo, D.~Tang, N.~Duan, X.~Feng, M.~Gong, L.~Shou, B.~Qin, T.~Liu,
+  D.~Jiang, and M.~Zhou, ``Codebert: A pre-trained model for programming and
+  natural languages,'' 2020. [Online]. Available:
+  \url{https://arxiv.org/abs/2002.08155}
+\BIBentrySTDinterwordspacing
+
+\bibitem{guo2021graphcodebertpretrainingcoderepresentations}
+\BIBentryALTinterwordspacing
+D.~Guo, S.~Ren, S.~Lu, Z.~Feng, D.~Tang, S.~Liu, L.~Zhou, N.~Duan,
+  A.~Svyatkovskiy, S.~Fu, M.~Tufano, S.~K. Deng, C.~Clement, D.~Drain,
+  N.~Sundaresan, J.~Yin, D.~Jiang, and M.~Zhou, ``Graphcodebert: Pre-training
+  code representations with data flow,'' 2021. [Online]. Available:
+  \url{https://arxiv.org/abs/2009.08366}
+\BIBentrySTDinterwordspacing
+
+\bibitem{ahmad2021unifiedpretrainingprogramunderstanding}
+\BIBentryALTinterwordspacing
+W.~U. Ahmad, S.~Chakraborty, B.~Ray, and K.-W. Chang, ``Unified pre-training
+  for program understanding and generation,'' 2021. [Online]. Available:
+  \url{https://arxiv.org/abs/2103.06333}
+\BIBentrySTDinterwordspacing
+
 \end{thebibliography}

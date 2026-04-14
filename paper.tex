@@ -67,6 +67,8 @@ Based on the three papers, we can identify several key challenges in natural cod
 	\item \textbf{Infilling and Editing}: InCoder~\cite{fried2023incodergenerativemodelcode} focuses on code infilling and synthesis. This is a huge challenge as the models need to be able to fill in missing parts of code and generate new code based on the context provided. This feature is particularly useful for tasks like code completion and code repair, but it requires the model to have a deep understanding of the code context and also the ability to generate code that fits well within that existing context.
 	\item \textbf{Bidirectional Alignment}: Another challenge is bidirectional alignment. This means that the model should be well aligned in both directions: from natural language to code and from code to natural language.
 \end{itemize}
+\subsection{Related Pre-trained Models for Code}
+	Several pre-trained models have been proposed other than the three focal papers I would be discussing. CodeBERT~\cite{feng2020codebertpretrainedmodelprogramming} is an encoder-only model trained with MLM and replaced token detection on NL-PL pairs. GraphCodeBERT~\cite{guo2021graphcodebertpretrainingcoderepresentations} incorporates data flow graphs into the encoder. PLBART~\cite{ahmad2021unifiedpretrainingprogramunderstanding} is an encoder-decoder model pre-trained with denoising autoencoding on code and natural language. Even though these models are effective somewhat, the decoder here lack awareness of code structure.
 \section{Methodologies}
 \subsection{CodeT5: Identifier-aware Encoder-Decoder Model}
 CodeT5 is built on the T5 architecture which is a transformer-based model which has been used for various natural language processing tasks  (e.g, Code Understanding, code generation, code translation, etc.). Firstly if I want to summarize the architecture of CodeT5 in two words then it would be Explicit and Focused understanding. CodeT5 is designed to be identifier-aware, which means that it understands the role of identifiers in code generally in better way than other compatriots.
@@ -77,22 +79,22 @@ def add(a, b):
 \end{lstlisting}
 Then the model can learn that it is a function and then perform addition. But the main porblem occured that the model seemed to be one sided. Some models like BERT was just better for understanding the code, some models acted like just decoder (e.g. GPT) which was just better for generating the code. But we wanted both generation and understanding. So these single-type model is not enough for us. The second problem was that the previous models were just taking the words as sequence. But in real the codes are much more structured. Example:
 \begin{lstlisting}
-	binarySearch(arr.left,right,x)
+binarySearch(arr.left,right,x)
 \end{lstlisting}
 Here the binary search is a function name and those arr, left, right, x are variables. So in CodeT5, they proposed an unified model where the encoder and decoder are trained together. And the main idea around CodeT5 are:
 \begin{itemize}
 	\item \textbf{Identifier-aware Learning}: The model would understand which one is identfier and which one is not. Example:
 	\begin{lstlisting}
-		def binarySearch(arr.left,right,x)
+def binarySearch(arr.left,right,x)
 	\end{lstlisting}
 	Here the model would understand that binarySearch is a function name and arr is an array and left, right are position variables. Understandint these meanings are necessary.
 	\item \textbf{Trained using Masked Language Modeling}: 
 	It means that when training, some identifiers are masked and the model is trained to perdict those masked identifiers. This helps the model to learn the semantics of identifiers and how they relate to each other in the code.
 	\item \textbf{Using code and comment together}: For a lot of codes htere are comments. Example:
 	\begin{lstlisting}
-		# increment value
-		def inc(x):
-			return x + 1
+# increment value
+def inc(x):
+	return x + 1
 	\end{lstlisting}
 	Here the model would learn comment-to-code relation. So if we give the input phrase ``increment value'', then the model would understand that it needs to generate a function that increments a value. The vice versa is also true.
 	\item \textbf{Dual learning}: The model is trained in a dual learning manner, which means it is trained for NL-to-PL generation and PL-to-NL generation at the same time.
@@ -100,8 +102,8 @@ Here the binary search is a function name and those arr, left, right, x are vari
 The previous models would see the code as a sequence of tokens.
 Code snippet:
 \begin{lstlisting}
-	def add(a, b):
-		return a + b
+def add(a, b):
+	return a + b
 \end{lstlisting}
 Here the previous models would just see it as a sequence of tokens such as \texttt{def}, \texttt{add}, \texttt{a}, and \texttt{b}, along with punctuation symbols. But the problem around that was that all models being treated as the same. But in code all tokens are not equal. Here \texttt{def} is a keyword and \texttt{add}, \texttt{a}, and \texttt{b} are identifiers. The identifiers being so much important are because with those developer gives their code a meaning and other people then would understand what the code is trying to interpret and deliver.
 
@@ -110,12 +112,12 @@ The issues of previous models are:
 	\item \textbf{Identifier Recognition Issue}: Previously models would not recognize the function names, array names. They would just see them as some random words.
 	\item \textbf{Lost of Meaning}: Code snippet:
 	\begin{lstlisting}
-		def binarySearch(arr.left,right,x)
+def binarySearch(arr.left,right,x)
 	\end{lstlisting}
 	Before model would think that binarySearch here just is token. But in reality, it is a search algorithm but they would not understand.
 	\item \textbf{Problem in Masking}: Code Snippet:
 	\begin{lstlisting}
-		def Mask(arr, left, right, x):
+def Mask(arr, left, right, x):
 	\end{lstlisting}
 	The previous models would just guess randomly as they would not know that they are identifers.
 \end{itemize}
@@ -130,12 +132,79 @@ Then in CodeT5:
 			\item \textbf{Task 2: Masked Identifier Prediction}:
 			Code Snippet:
 			\begin{lstlisting}
-				def Mask(arr, left, right, x):
+def Mask(arr, left, right, x):
 			\end{lstlisting}
 			The model is trained to predict masked identifiers. So it would learn the semantics of identifiers and how they relate to each other in the code. So this model would have to recover binarySearch from the masked code snippet.
 		\end{itemize}
 \end{itemize}
-The reson behind CodeT5 using T5 architecture is that using one model here the code summarization, generation, translation and defect detection can be done. So it is a unified model for all code related tasks. The main idea here is that the encoder and decoder are trained together. So the model can learn to understand the code and also generate the code at the same time.
+The reson behind CodeT5 using T5 architecture is that using one model here the code summarization, generation, translation and defect detection can be done. So it is a unified model for all code related tasks. The main idea here is that the encoder and decoder are trained together. So the model can learn to understand the code and also generate the code at the same time. T5 uses Encoder-Decoder structure. There encoder understands the input (code/text) and decoder generates the output. But in CodeT5, it just not only understands the code but also generates the code and also understands the identifiers. So CodeT5 added identifier awareness and special training objectives to the T5 architecture to improve code understanding and generation performance.
+The main ideas of pretraining in CodeT5 are:
+\begin{itemize}
+	\item \textbf{Identifier-aware Masked Span Prediction}: Example 1:
+	\begin{lstlisting}
+def add(a, b):
+	return a + b
+	\end{lstlisting}
+	After Masking the code snippet:
+	\begin{lstlisting}
+def [MASK](a, b):
+	return a + b
+	\end{lstlisting}
+	Here identifiers are masked more and more as the identifiers are meaningful and important. 
+	Example 2:
+	\begin{lstlisting}
+def calculateTotal(price):
+	\end{lstlisting}
+	After Masking the code snippet:
+	\begin{lstlisting}
+def <mask>(<mask>):
+	\end{lstlisting}
+
+	Here the model would guss calculateTotal and price. So model gets compelled to learn the context and semantics.
+
+	\item \textbf{Bimodal Dual Generation}:
+	Here the model is trained in two ways:
+	\begin{itemize}
+		\item \textbf{(A) Natural language to code generation}
+		\textbf{Input (Example):}
+		\begin{lstlisting}
+Add two numbers
+		\end{lstlisting}
+		\textbf{Output:}
+		\begin{lstlisting}
+def add(a, b):
+    return a + b
+		\end{lstlisting}
+
+		\item \textbf{(B) Code to natural language generation}
+		\textbf{Input (Example):}
+		\begin{lstlisting}
+def add(a, b):
+    return a + b
+		\end{lstlisting}
+		\textbf{Output:}
+		\begin{lstlisting}
+Add two numbers
+		\end{lstlisting}
+	\end{itemize}
+	As a result, model understands the code and also it can write the code better.
+	\item \textbf{Multi-task Learning}:
+	Here all tasks are trained together. As a result, model becomes much more versatile and can perform all the tasks using one model.
+
+
+\end{itemize}
+\subsubsection{Model Architecture Overview}
+The architecture of CodeT5 is based on the T5 model, which is an encoder-decoder transformer architecture. The encoder takes the input and decoder generates the output. The main novelty here is that the model is trained to be identifier-aware. 
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.85\textwidth]{codeT5demo.png}
+\caption{Pre-training tasks of CodeT5. We first alternately train span prediction, identifier prediction, and identifier tagging on both unimodal and bimodal data, and then leverage the bimodal data for dual generation training~\cite{DBLP:journals/corr/abs-2109-00859}}\label{fig:codet5_pretraining}
+\end{figure}
+The important thing here is its Masked Span Prediction. Here the identifiers are masked more frequently than non-identifiers. Here bimodal dual generation is also important. Here the model is trained to generate code from natural language and also to generate natural language from code. This dual training helps the model to understand the code better and also to generate better code.
+
+\subsection{InCoder: Generative Model for Code Infilling and Synthesis}
+
 
 
 
@@ -151,3 +220,6 @@ The document is now set up as a single-column LaTeX file with IEEE numeric refer
 \bibliography{references}
 
 \end{document}
+
+
+

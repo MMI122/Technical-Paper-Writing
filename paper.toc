@@ -16,15 +16,15 @@
 \contentsline {subsubsection}{\numberline {3.3.2}Structure-Aware Decoder}{15}{subsubsection.3.3.2}%
 \contentsline {paragraph}{Three training tasks}{15}{section*.7}%
 \contentsline {paragraph}{Final objective}{16}{section*.8}%
-\contentsline {section}{\numberline {4}Comparative Analysis}{16}{section.4}%
-\contentsline {subsection}{\numberline {4.1}Model Specifications}{16}{subsection.4.1}%
+\contentsline {section}{\numberline {4}Comparative Analysis}{17}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Model Specifications}{17}{subsection.4.1}%
 \contentsline {subsection}{\numberline {4.2}Performance on Code Generation Benchmarks}{17}{subsection.4.2}%
 \contentsline {subsubsection}{\numberline {4.2.1}Code Summarization (PL to NL)}{17}{subsubsection.4.2.1}%
 \contentsline {subsubsection}{\numberline {4.2.2}Code Translation (Java and C\#)}{17}{subsubsection.4.2.2}%
-\contentsline {subsubsection}{\numberline {4.2.3}Code Generation from Text (CONCODE)}{17}{subsubsection.4.2.3}%
+\contentsline {subsubsection}{\numberline {4.2.3}Code Generation from Text (CONCODE)}{18}{subsubsection.4.2.3}%
 \contentsline {subsubsection}{\numberline {4.2.4}Program Synthesis (HumanEval)}{18}{subsubsection.4.2.4}%
 \contentsline {subsubsection}{\numberline {4.2.5}Defect Detection and Clone Detection}{18}{subsubsection.4.2.5}%
 \contentsline {subsection}{\numberline {4.3}Strengths and Weaknesses}{18}{subsection.4.3}%
-\contentsline {section}{\numberline {5}Discussion}{18}{section.5}%
+\contentsline {section}{\numberline {5}Discussion}{19}{section.5}%
 \contentsline {section}{\numberline {6}Limitations and Future Proposed Idea}{19}{section.6}%
 \contentsline {section}{\numberline {7}Conclusion}{19}{section.7}%

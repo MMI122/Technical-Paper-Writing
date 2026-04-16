@@ -139,7 +139,7 @@ Code snippet:
 def add(a, b):
 	return a + b
 \end{lstlisting}
-Here the previous models would just see it as a sequence of tokens such as \texttt{def}, \texttt{add}, \texttt{a}, and \texttt{b}, along with punctuation symbols. But the problem around that was that all models being treated as the same. But in code all tokens are not equal. Here \texttt{def} is a keyword and \texttt{add}, \texttt{a}, and \texttt{b} are identifiers. The identifiers being so much important are because with those developer gives their code a meaning and other people then would understand what the code is trying to interpret and deliver.
+Here the previous models would just see it as a sequence of tokens such as \texttt{def}, \texttt{add}, \texttt{a}, and \texttt{b}, along with punctuation symbols. But the problem around that was that all tokens were being treated as the same. But in code all tokens are not equal. Here \texttt{def} is a keyword and \texttt{add}, \texttt{a}, and \texttt{b} are identifiers. The identifiers being so much important are because with those developer gives their code a meaning and other people then would understand what the code is trying to interpret and deliver.
 
 The issues of previous models are:
 \begin{itemize}
@@ -515,8 +515,7 @@ After Corruption:
 \end{lstlisting}
 Then the model would fill it with b.
 \subsubsection{Structure-Aware Encoder}
-
-The structure-aware encoder treats code as more than a simple token sequence. For plain text input, the model can rely only on the surface tokens. When we take code input, it uses the code tokens together with structural information from the AST and DFG.\@ This design follows StructCoder~\cite{10.1145/3636430} and here it allows the code not only to take the lexical form of the program but also to understand the syntax and semantics through the AST and DFG representations. 
+The structure-aware encoder in StructCoder treats code as more than just a sequence of simple tokens. The model can rely on the surface tokens for plain text input. But when we take the code input, it uses code tokens together with structural information from AST and DFG.\@ This design follows StructCoder~\cite{10.1145/3636430} and here it allows the code not only to take the lexical form of the program but also to understand the syntax and semantics through the AST and DFG representations. 
 
 \paragraph{Input representation}
 For a code example, the encoder input can be written as follows, following StructCoder~\cite{10.1145/3636430}:
@@ -535,10 +534,10 @@ E(l) = \sum_{i=1}^{|l|} E_{\mathrm{type}}(r_i.\mathrm{type}) \odot E_{\mathrm{he
 where $r_i$ is the $i$-th node on the path from the root to the leaf. The type embedding captures the node label, while the height embedding helps the model understand the position of the node inside the tree. As a result, the model can learn to recognize patterns in the AST structure.
 
 \paragraph{Structure-aware self-attention}
-The encoder then applies different attention patterns based on the type of relationship being modeled, again following StructCoder~\cite{10.1145/3636430}.
+Based on the relationship types, the model applies different attention mechanisms, following StructCoder~\cite{10.1145/3636430}.
 
 \begin{itemize}
-	\item \textbf{Code-to-code attention}: this is the standard token-to-token attention used in transformer models, with relative position information added to preserve order, as described in StructCoder~\cite{10.1145/3636430}.
+	\item \textbf{Code-to-code attention}: It is the standard token-to-token attention used in transformer models. It also incorporates relative position information to preserve order, as described in StructCoder~\cite{10.1145/3636430}.
 	\begin{equation}
 	A(s_i, s_j) = E_{s_i}^{\top} W_q^{\top} W_k E_{s_j} + \phi(|i-j|).
 	\end{equation}
@@ -546,7 +545,7 @@ The encoder then applies different attention patterns based on the type of relat
 	Standard T5 attention. The relative position function $\phi$ helps the model understand the order of tokens, which is crucial for code where the sequence matters.
 
 
-	\item \textbf{Leaf-to-leaf attention}: this attention compares two AST leaves by how much tree context they share. Two leaves that lie on a longer common path are treated as more closely related in StructCoder~\cite{10.1145/3636430}.
+	\item \textbf{Leaf-to-leaf attention}: This attention compares two AST leaves by how much tree context they share with each other. Two leaves that lie on a longer common path are treated as more closely related in StructCoder~\cite{10.1145/3636430}.
 	\begin{equation}
 	\operatorname{sim}(l_i, l_j) = \log\!\left(1 + \frac{\sum_{k=1}^{\min(|l_i|,|l_j|)} \mathbb{1}(r_k^i = r_k^j)}{|l_i||l_j|}\right).
 	\end{equation}
@@ -585,7 +584,7 @@ The encoder then applies different attention patterns based on the type of relat
 		a <-> unrelated variable
 	\end{lstlisting}
 
-	\item \textbf{Code-to-leaf and code-to-variable attention}: these cross-type links connect code tokens with the AST leaves and DFG variables that correspond to them, following StructCoder~\cite{10.1145/3636430}.
+	\item \textbf{Code-to-leaf and code-to-variable attention}: These cross-type links connect code tokens with the AST leaves and DFG variables that correspond to them, following StructCoder~\cite{10.1145/3636430}.
 	\begin{equation}
 	A(s_i, l_j) =
 	\begin{cases}
@@ -630,13 +629,19 @@ The language modeling head is the familiar decoder objective. For a hidden state
 \begin{equation}
 p_i = \operatorname{softmax}(W h_i).
 \end{equation}
+Here $W$ is the weight matrix that maps the hidden state to the vocabulary space. The model learns to predict the next token based on the hidden representation. $h_i$ is the hidden state representing the current context in the decoder. It means what the model has understood. Softmax turns the raw scores into probabilities over the vocabulary. So the output here is the probability distribution over vocabulary. Example:
+\begin{lstlisting}
+	return a + _
+\end{lstlisting}
+Here the model would predict b with the highest probability. The example context is just generalized. Obviously, the model would have more context to make a better prediction.
+
 This is the usual transformer-style prediction step: the model takes the hidden representation and turns it into a distribution over the vocabulary. The corresponding loss is also defined in StructCoder~\cite{10.1145/3636430}:
 \begin{equation}
 L_{lm} = -\frac{1}{|T|} \sum_{i=1}^{|T|} \log p_i(t_i).
 \end{equation}
-This part is actually same as the standard language modeling. So it just ensures that the model learns to generate the correct token sequence overall.
+This part is actually same as the standard language modeling. So it just ensures that the model learns to generate the correct token sequence overall. But there is a catch behind that equation. Here the equation can be interpreted as if the model is predicting more wrong tokens the loss would be higher. So the model is incentivized to predict the correct tokens to minimize the loss.
 
-The AST path prediction head is what makes the decoder syntax-aware. For every token, it predicts root$\rightarrow$ leaf path. \@ If we take the example \texttt{return a + b}, then the token \texttt{b} is not just a token by itself; it also sits somewhere in the tree, for example along a path like \texttt{=} $\rightarrow$ \texttt{+} $\rightarrow$ \texttt{b}. The decoder learns to recover that path. Formally, the path-level prediction is written as StructCoder~\cite{10.1145/3636430}:
+The AST path prediction head is what makes the decoder syntax-aware. It is a game changer for StructCoder. For every token, it predicts root$\rightarrow$ leaf path. \@ If we take the example \texttt{return a + b}, then the token \texttt{b} is not just a token by itself; it also sits somewhere in the tree, for example along a path like \texttt{=} $\rightarrow$ \texttt{+} $\rightarrow$ \texttt{b}. The decoder learns to recover that path. Formally, the path-level prediction is written as StructCoder~\cite{10.1145/3636430}:
 \begin{equation}
 p^{ast}_{ik} = \operatorname{softmax}\!\left(W^{( |l_i|-k )}_{ast} h_i\right).
 \end{equation}
@@ -650,10 +655,12 @@ The third task is dataflow prediction. Here the model gets to understand the sem
 \begin{equation}
 p^{dfg}_{ij} = \sigma\!\left(h_i^{\top} U_{dfg}^{\top} V_{dfg} h_j + u_{dfg}^{\top} h_i + v_{dfg}^{\top} h_j + w_{dfg}\right).
 \end{equation}
+Let us try to simplify it a little bit. Here, suppose the probability is 1, then it would just mean that there is an edge and if it is 0, then it would mean that there is no edge.
 The sigmoid makes the result a probability, so the model can decide whether the edge exists or not. It also implies that direction matters. The corresponding binary cross-entropy loss is also from StructCoder~\cite{10.1145/3636430}:
 \begin{equation}
 L_{dfp} = -\frac{1}{|T|^2} \sum_{i=1}^{|T|} \sum_{j=1}^{|T|} \Big[y_{ij} \log p^{dfg}_{ij} + (1-y_{ij}) \log(1-p^{dfg}_{ij})\Big].
 \end{equation}
+Let us try to simplify it a little bit. Here $y_{ij}$ is 1 if there is an edge from token $j$ to token $i$, and it would be 0 otherwise. So the loss encourages the model to assign high probabilities to actual edges and low probabilities to non-edges. The reward structure for correct edges and penalties for incorrect edges just makes the model much more effective. By learning to predict these dataflow relations, the decoder becomes more aware of the semantic structure of the code.
 It eventually helps in semantic-aware generation.
 
 \paragraph{Final objective}
@@ -728,18 +735,18 @@ CodeT5 reports defect detection and clone detection performance (for example, de
 
 \begin{itemize}
 	\item \textbf{CodeT5}: 
-	CodeT5's main strength is that using one model it can simultaneously understand and generate code. It is more of like performing multiple tasks with one model. It is trained to be identifier-aware and it is specifically trained to understand which one is variable and which one is function name. But it has its fair share of weaknesses. It does not use AST or DFG.\@ So it does not understand the syntax structure of the code and does not even understand the dataflow of the code. So it faces problems in generating complex code.
+	CodeT5's main strength is that using one model it can simultaneously understand and generate code. It is more like performing multiple tasks with one model. It is trained to be identifier-aware and it is specifically trained to understand which one is a variable and which one is a function name. But it has its fair share of weaknesses. It does not use AST or DFG.\@ So it does not understand the syntax structure of the code and does not even understand the dataflow of the code. So it faces problems in generating complex code.
 	\item \textbf{InCoder}: 
 	InCoder's main strength is that it uses a novel training objective which is code infilling using bidirectional context. When normal models used to see only left context, InCoder sees both left and right context. So it is much more powerful for code infilling and synthesis. But it has some drawbacks too. The decoder of InCoder doesn't understand any structure. It has even no structural inductive bias. So even if syntax is correct, it may generate code which is not semantically correct.
-	\item \textbf{StructCoder}: StructCoder's main strength is that it has explicitly incorporated it to be structure-aware. It uses AST and DFG to understand the structure of the code. So it is more syntax and semantic aware. AST path prediction helps it to understand syntax structure and Data Flow Prediction helps it to understand the variable flow. So ultimately the code becomes more syntactically and semantically correct. But its weakness is its preprocessing. So the sequence overhead becomes bigger.
+	\item \textbf{StructCoder}: StructCoder's main strength is that it is explicitly structure-aware. It uses AST and DFG to understand the structure of the code. So it is more syntax- and semantics-aware. AST path prediction helps it to understand syntax structure and dataflow prediction helps it to understand the variable flow. So ultimately the code becomes more syntactically and semantically correct. But its weakness is its preprocessing. So the sequence overhead becomes bigger.
 \end{itemize}
 \section{Discussion}
-CodeT5 mainly focused on identifier (variable and function name) awareness. It trains for the purpose of identifying variable and keyword. As a result, understanding code becomes easier. Whereas for the case of InCoder, it tries to understand the code by filling in the missing part. So it is more of a training strategy. It is not an architectural change. Rather it is a training change in a smart way. And then StructCoder is more of an architectural change. It uses AST and DFG to understand the structure of the code. So it is more of a structural change. Every model has its good and bad aspects. The problem with CodeT5 is that it does not use AST/structure. So it does feel the issue in generating complex code. For the case of InCoder, it doesn't understand the syntax or dataflow. So it may generate code which is not syntactically correct or semantically correct. But for the case of StructCoder, it is more aware of the structure and semantics. So it generates better code. But the issue with this is that as we add AST and DFG to it, so the input size goes bigger and inference becomes slower. So it is a trade-off between performance and speed.
+CodeT5 mainly focuses on identifier (variable and function name) awareness. It trains for the purpose of identifying variables and keywords. As a result, understanding code becomes easier. Whereas for the case of InCoder, it tries to understand the code by filling in the missing part. So it is more of a training strategy. It is not an architectural change. Rather it is a training change in a smart way. And then StructCoder is more of an architectural change. It uses AST and DFG to understand the structure of the code. So it is more of a structural change. Every model has its good and bad aspects. The problem with CodeT5 is that it does not use AST/structure. So it does feel the issue in generating complex code. For the case of InCoder, it doesn't understand the syntax or dataflow. So it may generate code which is not syntactically correct or semantically correct. But for the case of StructCoder, it is more aware of the structure and semantics. So it generates better code. But the issue with this is that as we add AST and DFG to it, the input size gets bigger and inference becomes slower. So it is a trade-off between performance and speed.
 \section{Limitations and Future Proposed Idea}
-I would like to combine those three models together. I would like to do InCoder-style infilling where it can fill in the missing part after watching the left and right context. Rather than using full AST input, I would like to work on graph transformer-based architecture where it can understand the structure of the code without having to input the full AST.\@ So it would be more efficient and faster.\@ It was likely the limitation of StructCoder that it has to input the full AST and DFG.\@ And I would also like to add CodeT5-style identifier-aware training objectives to it. So it would be more of a unified model which can understand the code better and also generate better code in a faster way.
+I would like to combine those three models together. I would like to do InCoder-style infilling where it can fill in the missing part after watching the left and right context. Rather than using full AST input, I would like to work on graph transformer-based architecture where it can understand the structure of the code without having to input the full AST.\@ So it would be more efficient and faster.\@ It is likely that the limitation of StructCoder is that it has to input the full AST and DFG.\@ And I would also like to add CodeT5-style identifier-aware training objectives to it. So it would be more of a unified model which can understand the code better and also generate better code in a faster way.
 
 \section{Conclusion}
-In this paper, I have analyzed three influential code generation models: CodeT5, InCoder, and StructCoder. CodeT5 here introduces a unified encoder-decoder architecture with identifier-aware pre-training tasks, improving code understanding and generation. Whereas InCoder focuses on a novel training objective which models code infilling with bidirectional context, enabling it to generate code that fits well within existing code. And StructCoder incorporates the idea of checking if it is syntactically correct. So I think unified work would be really interesting where we can combine the best of all three worlds. Then it may achieve a higher benchmark performance and also be more efficient in terms of inference time.
+In this paper, I have analyzed three influential code generation models: CodeT5, InCoder, and StructCoder. CodeT5 here introduces a unified encoder-decoder architecture with identifier-aware pre-training tasks, improving code understanding and generation. Whereas InCoder focuses on a novel training objective which models code infilling with bidirectional context, enabling it to generate code that fits well within existing code. And StructCoder incorporates the idea of checking if it is syntactically correct. So I think a unified work would be really interesting where we can combine the best of all three worlds. Then it may achieve higher benchmark performance and also be more efficient in terms of inference time.
 	
 
 

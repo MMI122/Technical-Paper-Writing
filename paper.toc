@@ -1,0 +1,30 @@
+\contentsline {section}{\numberline {1}Introduction}{2}{section.1}%
+\contentsline {section}{\numberline {2}Literature Review}{2}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Background and Problem Formulation}{2}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Key Challenges in Neural Code Generation}{3}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Related Pre-trained Models for Code}{4}{subsection.2.3}%
+\contentsline {section}{\numberline {3}Methodologies}{4}{section.3}%
+\contentsline {subsection}{\numberline {3.1}CodeT5: Identifier-aware Encoder-Decoder Model}{4}{subsection.3.1}%
+\contentsline {subsubsection}{\numberline {3.1.1}Model Architecture Overview}{7}{subsubsection.3.1.1}%
+\contentsline {subsection}{\numberline {3.2}InCoder: Generative Model for Code Infilling and Synthesis}{7}{subsection.3.2}%
+\contentsline {subsubsection}{\numberline {3.2.1}Model Architecture Overview}{11}{subsubsection.3.2.1}%
+\contentsline {subsection}{\numberline {3.3}StructCoder: Structure-aware Code Generation}{11}{subsection.3.3}%
+\contentsline {subsubsection}{\numberline {3.3.1}Structure-Aware Encoder}{12}{subsubsection.3.3.1}%
+\contentsline {paragraph}{Input representation}{13}{section*.3}%
+\contentsline {paragraph}{Input embeddings}{13}{section*.4}%
+\contentsline {paragraph}{Structure-aware self-attention}{13}{section*.5}%
+\contentsline {subsubsection}{\numberline {3.3.2}Structure-Aware Decoder}{15}{subsubsection.3.3.2}%
+\contentsline {paragraph}{Three training tasks}{15}{section*.7}%
+\contentsline {paragraph}{Final objective}{16}{section*.8}%
+\contentsline {section}{\numberline {4}Comparative Analysis}{16}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Model Specifications}{16}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Performance on Code Generation Benchmarks}{17}{subsection.4.2}%
+\contentsline {subsubsection}{\numberline {4.2.1}Code Summarization (PL to NL)}{17}{subsubsection.4.2.1}%
+\contentsline {subsubsection}{\numberline {4.2.2}Code Translation (Java and C\#)}{17}{subsubsection.4.2.2}%
+\contentsline {subsubsection}{\numberline {4.2.3}Code Generation from Text (CONCODE)}{17}{subsubsection.4.2.3}%
+\contentsline {subsubsection}{\numberline {4.2.4}Program Synthesis (HumanEval)}{18}{subsubsection.4.2.4}%
+\contentsline {subsubsection}{\numberline {4.2.5}Defect Detection and Clone Detection}{18}{subsubsection.4.2.5}%
+\contentsline {subsection}{\numberline {4.3}Strengths and Weaknesses}{18}{subsection.4.3}%
+\contentsline {section}{\numberline {5}Discussion}{18}{section.5}%
+\contentsline {section}{\numberline {6}Limitations and Future Proposed Idea}{19}{section.6}%
+\contentsline {section}{\numberline {7}Conclusion}{19}{section.7}%

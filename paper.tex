@@ -47,8 +47,38 @@
 
 \begin{document}
 
-\maketitle
+% ===== TITLE PAGE =====
+\begin{titlepage}
+	\centering
+	\vspace*{2cm}
+	
+	{\LARGE\bfseries Neural Approaches to Code Generation: From Natural Language Understanding to Structured Program Synthesis\par}
+	
+	\vspace{3cm}
+	
+	{\large\bfseries Author Information:\par}
+	\vspace{1.5cm}
+	
+	{\Large\bfseries Md Mubin Islam Alif\par}
+	\vspace{0.5cm}
+	
+	{\large Roll: 2107090\par}
+	\vspace{3cm}
+	
+	{\large Date: \today\par}
+	
+	\vfill
+	
+\end{titlepage}
 
+\newpage
+
+% ===== TABLE OF CONTENTS =====
+\tableofcontents
+
+\newpage
+
+% ===== ABSTRACT =====
 \begin{abstract}
 Code generation nowadays is producing executable code from natural language descriptions. This paper explores the latest neural approaches to code generation, focusing on how models understand natural language and synthesize structured programs. This paper reviews three papers: CodeT5~\cite{wang-etal-2021-codet5}, InCoder~\cite{fried2023incodergenerativemodelcode}, and StructCoder~\cite{10.1145/3636430}. Here I am discussing the methodologies, strengths, and limitations of each approach, and how they contribute to advancing the state of the art in code generation. Here CodeT5 presents an identifier-aware encoder-decoder architecture for code understanding and generation~\cite{wang-etal-2021-codet5}. InCoder focuses on code infilling and synthesis through a generative modeling approach~\cite{fried2023incodergenerativemodelcode}. StructCoder adds structure awareness to improve generation quality on code translation and text-to-code tasks~\cite{10.1145/3636430}.
 \end{abstract}
@@ -409,7 +439,7 @@ The GPT-based architecture model used to see the left context and it would not b
 	\item \textbf{Moving the Masked Span to the End}
 	\item \textbf{Training the Model to Predict the Masked Span}
 \end{itemize}
-\section{StructCoder: Structure-aware Code Generation}
+\subsection{StructCoder: Structure-aware Code Generation}
 In the transformer-based models, the main problem is that they used to see the code as text. But in reality, the code has its syntax and also the semantics (meaning).
 \begin{lstlisting}
 a = 5
@@ -484,7 +514,7 @@ After Corruption:
 	a = __ + c
 \end{lstlisting}
 Then the model would fill it with b.
-\subsection{Structure-Aware Encoder}
+\subsubsection{Structure-Aware Encoder}
 
 The structure-aware encoder treats code as more than a simple token sequence. For plain text input, the model can rely only on the surface tokens. When we take code input, it uses the code tokens together with structural information from the AST and DFG.\@ This design follows StructCoder~\cite{10.1145/3636430} and here it allows the code not only to take the lexical form of the program but also to understand the syntax and semantics through the AST and DFG representations. 
 
@@ -577,7 +607,7 @@ Links:
 \end{lstlisting}
 
 This design gives the encoder a more complete view of the program.\@ Rather than treating the code as a flat sequence of tokens, the model can understand the hierarchical structure of the code through the AST and the dataflow through the DFG.\@ With this attention mechanism, the model can learn to recognize patterns in the code structure.
-\subsection{Structure-Aware Decoder}
+\subsubsection{Structure-Aware Decoder}
 
 \begin{figure}[H]
 \centering

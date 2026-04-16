@@ -451,7 +451,8 @@ Here the syntax has to be alright and also the semantics here would be that b is
 	\begin{lstlisting}
 		a = b + c
 	\end{lstlisting}
-	\begin{center}
+	\begin{figure}[H]
+	\centering
 	\begin{forest}
 	for tree={
 		draw,
@@ -471,7 +472,8 @@ Here the syntax has to be alright and also the semantics here would be that b is
 		]
 	]
 	\end{forest}
-	\end{center}
+		\caption{Abstract Syntax Tree (AST) for the expression $a = b + c$.}\label{fig:ast_tree}
+		\end{figure}
 	It says which one is operator and which one is variable.
 	
 	\item \textbf{Dataflow Graph}: 

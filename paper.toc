@@ -10,12 +10,12 @@
 \contentsline {subsubsection}{\numberline {3.2.1}Model Architecture Overview}{11}{subsubsection.3.2.1}%
 \contentsline {subsection}{\numberline {3.3}StructCoder: Structure-aware Code Generation}{11}{subsection.3.3}%
 \contentsline {subsubsection}{\numberline {3.3.1}Structure-Aware Encoder}{12}{subsubsection.3.3.1}%
-\contentsline {paragraph}{Input representation}{13}{section*.3}%
-\contentsline {paragraph}{Input embeddings}{13}{section*.4}%
-\contentsline {paragraph}{Structure-aware self-attention}{13}{section*.5}%
+\contentsline {paragraph}{Input representation}{13}{section*.4}%
+\contentsline {paragraph}{Input embeddings}{13}{section*.5}%
+\contentsline {paragraph}{Structure-aware self-attention}{13}{section*.6}%
 \contentsline {subsubsection}{\numberline {3.3.2}Structure-Aware Decoder}{15}{subsubsection.3.3.2}%
-\contentsline {paragraph}{Three training tasks}{15}{section*.7}%
-\contentsline {paragraph}{Final objective}{16}{section*.8}%
+\contentsline {paragraph}{Three training tasks}{15}{section*.8}%
+\contentsline {paragraph}{Final objective}{16}{section*.9}%
 \contentsline {section}{\numberline {4}Comparative Analysis}{17}{section.4}%
 \contentsline {subsection}{\numberline {4.1}Model Specifications}{17}{subsection.4.1}%
 \contentsline {subsection}{\numberline {4.2}Performance on Code Generation Benchmarks}{17}{subsection.4.2}%

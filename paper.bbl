@@ -21,12 +21,16 @@
 \providecommand{\BIBdecl}{\relax}
 \BIBdecl
 
-\bibitem{DBLP:journals/corr/abs-2109-00859}
+\bibitem{wang-etal-2021-codet5}
 \BIBentryALTinterwordspacing
-Y.~Wang, W.~Wang, S.~R. Joty, and S.~C.~H. Hoi, ``Codet5: Identifier-aware
+Y.~Wang, W.~Wang, S.~Joty, and S.~C. Hoi, ``{C}ode{T}5: Identifier-aware
   unified pre-trained encoder-decoder models for code understanding and
-  generation,'' \emph{CoRR}, vol. abs/2109.00859, 2021. [Online]. Available:
-  \url{https://arxiv.org/abs/2109.00859}
+  generation,'' in \emph{Proceedings of the 2021 Conference on Empirical
+  Methods in Natural Language Processing}, M.-F. Moens, X.~Huang, L.~Specia,
+  and S.~W.-t. Yih, Eds.\hskip 1em plus 0.5em minus 0.4em\relax Online and
+  Punta Cana, Dominican Republic: Association for Computational Linguistics,
+  Nov. 2021, pp. 8696--8708. [Online]. Available:
+  \url{https://aclanthology.org/2021.emnlp-main.685/}
 \BIBentrySTDinterwordspacing
 
 \bibitem{fried2023incodergenerativemodelcode}

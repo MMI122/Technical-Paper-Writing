@@ -1,4 +1,5 @@
 \documentclass[12pt]{article}
+% chktex-file 38
 
 \usepackage[a4paper,margin=1in]{geometry}
 \usepackage[utf8]{inputenc}
@@ -41,6 +42,21 @@
 	tabsize=4,
 }
 
+\newcommand{\chapterheading}[2]{%
+\refstepcounter{section}%
+\setcounter{subsection}{0}%
+\setcounter{subsubsection}{0}%
+\par\vspace{1.2em}
+\begin{samepage}
+\noindent{\Large\bfseries Chapter #1\par}
+\phantomsection%
+\addcontentsline{toc}{section}{Chapter #1: #2}%
+\vspace{\baselineskip}
+\noindent{\LARGE\bfseries #2\par}
+\end{samepage}
+\vspace{1.0em}
+}
+
 \title{Neural Approaches to Code Generation: From Natural Language Understanding to Structured Program Synthesis}
 \author{Md Mubin Islam Alif}
 \date{\today}
@@ -49,27 +65,61 @@
 
 % ===== TITLE PAGE =====
 \begin{titlepage}
+	\thispagestyle{empty}
 	\centering
-	\vspace*{2cm}
+	\vspace*{1.1cm}
 	
-	{\LARGE\bfseries Neural Approaches to Code Generation: From Natural Language Understanding to Structured Program Synthesis\par}
+	{\large\bfseries CSE 3230: Technical Writing and Seminar\par}
+	\vspace{0.9cm}
 	
-	\vspace{3cm}
+	{\LARGE\bfseries Neural Approaches to Code Generation:\par}
+	\vspace{0.2cm}
+	{\LARGE\bfseries From Natural Language Understanding to Structured Program Synthesis\par}
+	\vspace{0.9cm}
 	
-	{\large\bfseries Author Information:\par}
-	\vspace{1.5cm}
+	{\large\bfseries Submitted by\par}
+	\vspace{0.6cm}
 	
 	{\Large\bfseries Md Mubin Islam Alif\par}
-	\vspace{0.5cm}
-	
+	\vspace{0.2cm}
 	{\large Roll: 2107090\par}
-	\vspace{3cm}
+	\vspace{0.9cm}
 	
-	{\large Date: \today\par}
+	\includegraphics[width=0.18\textwidth]{kuetlogo.png}
+	\vspace{0.9cm}
+	
+	{\large Department of Computer Science and Engineering\par}
+	{\large Khulna University of Engineering and Technology\par}
+	{\large Khulna-9203, Bangladesh\par}
+	\vspace{0.9cm}
+	
+	{\large \today\par}
 	
 	\vfill
 	
 \end{titlepage}
+
+\newpage
+
+% ===== MAIN SOURCES =====
+\section*{Main Sources}
+\addcontentsline{toc}{section}{Main Sources}
+
+\begin{enumerate}
+\item Y. Wang, W. Wang, S. Joty, and S. C. Hoi, ``CodeT5: Identifier-aware unified pre-trained encoder-decoder models for code understanding and generation,'' in \textit{Proceedings of the 2021 Conference on Empirical Methods in Natural Language Processing}, M.-F. Moens, X. Huang, L. Specia, and S. W.-t. Yih, Eds. Online and Punta Cana, Dominican Republic: Association for Computational Linguistics, Nov. 2021, pp. 8696--8708. [Online]. Available: \url{https://aclanthology.org/2021.emnlp-main.685/}
+
+\item D. Fried, A. Aghajanyan, J. Lin, S. Wang, E. Wallace, F. Shi, R. Zhong, W. tau Yih, L. Zettlemoyer, and M. Lewis, ``Incoder: A generative model for code infilling and synthesis,'' 2023. [Online]. Available: \url{https://arxiv.org/abs/2204.05999}
+
+\item S. Tipirneni, M. Zhu, and C. K. Reddy, ``Structcoder: Structure-aware transformer for code generation,'' \textit{ACM Trans. Knowl. Discov. Data}, vol. 18, no. 3, Jan. 2024. [Online]. Available: \url{https://doi.org/10.1145/3636430}
+\end{enumerate}
+
+\newpage
+
+% ===== ABSTRACT =====
+\addcontentsline{toc}{section}{Abstract}
+\begin{abstract}
+Code generation nowadays is producing executable code from natural language descriptions. This paper explores the latest neural approaches to code generation, focusing on how models understand natural language and synthesize structured programs. This paper reviews three papers: CodeT5, InCoder, and StructCoder. Here I am discussing the methodologies, strengths, and limitations of each approach, and how they contribute to advancing the state of the art in code generation. Here CodeT5 presents an identifier-aware encoder-decoder architecture for code understanding and generation. InCoder focuses on code infilling and synthesis through a generative modeling approach. StructCoder adds structure awareness to improve generation quality on code translation and text-to-code tasks.
+\end{abstract}
 
 \newpage
 
@@ -78,17 +128,20 @@
 
 \newpage
 
-% ===== ABSTRACT =====
-\begin{abstract}
-Code generation nowadays is producing executable code from natural language descriptions. This paper explores the latest neural approaches to code generation, focusing on how models understand natural language and synthesize structured programs. This paper reviews three papers: CodeT5~\cite{wang-etal-2021-codet5}, InCoder~\cite{fried2023incodergenerativemodelcode}, and StructCoder~\cite{10.1145/3636430}. Here I am discussing the methodologies, strengths, and limitations of each approach, and how they contribute to advancing the state of the art in code generation. Here CodeT5 presents an identifier-aware encoder-decoder architecture for code understanding and generation~\cite{wang-etal-2021-codet5}. InCoder focuses on code infilling and synthesis through a generative modeling approach~\cite{fried2023incodergenerativemodelcode}. StructCoder adds structure awareness to improve generation quality on code translation and text-to-code tasks~\cite{10.1145/3636430}.
-\end{abstract}
+% ===== LIST OF FIGURES =====
+\listoffigures
 
-\section{Introduction}
+% ===== LIST OF TABLES =====
+\listoftables
+
+\newpage
+
+\chapterheading{1}{Introduction}
 The idea of code generation from natural language has been fascinating researchers for a long time. With the progressive work in deep learning and some transformer-based models, we have seen significant advancements in this area. The ability of machines to understand natural language and generate structured code has the potential to revolutionize software development. But the issue has been that while models can generate code, they often struggle with understanding the gist of programming logic and structure, which eventually leads to code that may be syntactically correct but semantically flawed. But sometimes even syntactical correctness is flawed as the models are not even aware of the identifiers and structure of the code. This is where models like CodeT5, InCoder, and StructCoder come into play, each addressing different aspects of the code generation problem.
 
 These three models have introduced three different mechanisms to improve code generation. CodeT5 is built on the T5 architecture which is a transformer-based model that has been adapted for code understanding and generation. But on top of it, CodeT5 incorporated the idea of being identifier-aware, which means that it can better understand the role of identifiers in code, which is crucial for generating meaningful and functional code. InCoder, on the other hand, greatly focuses on code infilling and synthesis. It uses a generative modeling approach which allows it to fill in missing parts of code and generate new code based on the context provided. This is particularly useful for tasks like code completion and code repair. StructCoder went one more step beyond. It added structure awareness to the model, which means that it can better understand the hierarchical and logical structure of the code. All three models have shown significant improvements in code generation, but they also have their own limitations.
 
-\section{Literature Review}
+\chapterheading{2}{Literature Review}
 \subsection{Background and Problem Formulation}
 When we talk about code generation, we essentially mean two things: (1) \textit{natural language to code} (NL-to-PL) generation, where the model takes a natural language description and generates code. (2) \textit{code to natural language} (PL-to-NL) generation, where the model takes code and generates a natural language description of what the code does. Both of these tasks are important for different aspects. The former is crucial for automating software development, where developers can simply describe what they want in natural language and the model can interpret that and generate the corresponding code. The latter is important for code documentation and understanding, where developers use natural language to explain what code does. It helps in understanding the codebase and maintaining the codebase effectively. It eventually helps in documentation and code review processes. But both tasks need to understand the intent, generate syntactically correct code, and also generate semantically meaningful code. This is where the challenge lies.
 Early code generation focused on neural networks that were trained on large code corpora. But the transformer's self-attention mechanism proved to be much more of a game changer for capturing long-range dependencies in code~\cite{vaswani2023attentionneed}. Pre-training on large unlabeled code corpora (e.g., GitHub) became standard, with objectives such as masked language modeling (MLM), denoising autoencoding (DAE), and replaced token detection (RTD).
@@ -103,7 +156,7 @@ Based on the three papers, we can identify several key challenges in natural cod
 \end{itemize}
 \subsection{Related Pre-trained Models for Code}
 	Several pre-trained models have been proposed other than the three focal papers I would be discussing. CodeBERT~\cite{feng2020codebertpretrainedmodelprogramming} is an encoder-only model trained with MLM and replaced token detection on NL-PL pairs. GraphCodeBERT~\cite{guo2021graphcodebertpretrainingcoderepresentations} incorporates data flow graphs into the encoder. PLBART~\cite{ahmad2021unifiedpretrainingprogramunderstanding} is an encoder-decoder model pre-trained with denoising autoencoding on code and natural language. Even though these models are somewhat effective, the decoder here lacks awareness of code structure.
-\section{Methodologies}
+\chapterheading{3}{Methodologies}
 \subsection{CodeT5: Identifier-aware Encoder-Decoder Model}
 CodeT5 is built on the T5 architecture which is a transformer-based model which has been used for various natural language processing tasks  (e.g, Code Understanding, code generation, code translation, etc.). Firstly if I want to summarize the architecture of CodeT5 in two words then it would be Explicit and Focused understanding. CodeT5 is designed to be identifier-aware, which means that it understands the role of identifiers in code generally in a better way than other compatriots.
 For natural language processing tasks, there were several powerful models like BERT, GPT, T5, etc. These models were pre-trained on large corpora of text data and then for smaller tasks they were fine tuned. As a result, even for less amount of data, there was good performance. So researchers were thinking that if we could do the same thing for code, then we could also get good performance for code generation and code understanding tasks. So they were trying to apply NLP models. Example:
@@ -673,7 +726,7 @@ L = L_{lm} + \alpha_1 L_{app} + \alpha_2 L_{dfp}.
 Here $L_{lm}$ controls token correctness, $L_{app}$ controls syntax correctness, and $L_{dfp}$ controls semantic correctness. The weights $\alpha_1$ and $\alpha_2$ balance how much the syntax and dataflow tasks matter during training. So the decoder is still generating code normally, but it learns from AST and DFG supervision at the same time~\cite{10.1145/3636430}.
 
 For example, if the model sees \texttt{a = b + c}, the language modeling head learns to generate the token sequence, the AST path head learns the tree structure of each token, and the DFG head learns that \texttt{b} and \texttt{c} flow into \texttt{a}. It is the core idea behind this Structure-aware decoder.
-\section{Comparative Analysis}
+\chapterheading{4}{Comparative Analysis}
 
 \subsection{Model Specifications}
 
@@ -742,17 +795,18 @@ CodeT5 reports defect detection and clone detection performance (for example, de
 	InCoder's main strength is that it uses a novel training objective which is code infilling using bidirectional context. When normal models used to see only left context, InCoder sees both left and right context. So it is much more powerful for code infilling and synthesis. But it has some drawbacks too. The decoder of InCoder doesn't understand any structure. It has even no structural inductive bias. So even if syntax is correct, it may generate code which is not semantically correct.
 	\item \textbf{StructCoder}: StructCoder's main strength is that it is explicitly structure-aware. It uses AST and DFG to understand the structure of the code. So it is more syntax- and semantics-aware. AST path prediction helps it to understand syntax structure and dataflow prediction helps it to understand the variable flow. So ultimately the code becomes more syntactically and semantically correct. But its weakness is its preprocessing. So the sequence overhead becomes bigger.
 \end{itemize}
-\section{Discussion}
+\chapterheading{5}{Discussion}
 CodeT5 mainly focuses on identifier (variable and function name) awareness. It trains for the purpose of identifying variables and keywords. As a result, understanding code becomes easier. Whereas for the case of InCoder, it tries to understand the code by filling in the missing part. So it is more of a training strategy. It is not an architectural change. Rather it is a training change in a smart way. And then StructCoder is more of an architectural change. It uses AST and DFG to understand the structure of the code. So it is more of a structural change. Every model has its good and bad aspects. The problem with CodeT5 is that it does not use AST/structure. So it does feel the issue in generating complex code. For the case of InCoder, it doesn't understand the syntax or dataflow. So it may generate code which is not syntactically correct or semantically correct. But for the case of StructCoder, it is more aware of the structure and semantics. So it generates better code. But the issue with this is that as we add AST and DFG to it, the input size gets bigger and inference becomes slower. So it is a trade-off between performance and speed.
-\section{Limitations and Future Proposed Idea}
+\chapterheading{6}{Limitations and Future Proposed Idea}
 I would like to combine those three models together. I would like to do InCoder-style infilling where it can fill in the missing part after watching the left and right context. Rather than using full AST input, I would like to work on graph transformer-based architecture where it can understand the structure of the code without having to input the full AST.\@ So it would be more efficient and faster.\@ It is likely that the limitation of StructCoder is that it has to input the full AST and DFG.\@ And I would also like to add CodeT5-style identifier-aware training objectives to it. So it would be more of a unified model which can understand the code better and also generate better code in a faster way.
 
-\section{Conclusion}
+\chapterheading{7}{Conclusion}
 In this paper, I have analyzed three influential code generation models: CodeT5, InCoder, and StructCoder. CodeT5 here introduces a unified encoder-decoder architecture with identifier-aware pre-training tasks, improving code understanding and generation. Whereas InCoder focuses on a novel training objective which models code infilling with bidirectional context, enabling it to generate code that fits well within existing code. And StructCoder incorporates the idea of checking if it is syntactically correct. So I think a unified work would be really interesting where we can combine the best of all three worlds. Then it may achieve higher benchmark performance and also be more efficient in terms of inference time.
 	
 
 
 \bibliographystyle{IEEEtran}
+	\addcontentsline{toc}{section}{References}
 \bibliography{references}
 
 \end{document}

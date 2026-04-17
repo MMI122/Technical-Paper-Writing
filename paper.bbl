@@ -33,14 +33,6 @@ Y.~Wang, W.~Wang, S.~Joty, and S.~C. Hoi, ``{C}ode{T}5: Identifier-aware
   \url{https://aclanthology.org/2021.emnlp-main.685/}
 \BIBentrySTDinterwordspacing
 
-\bibitem{fried2023incodergenerativemodelcode}
-\BIBentryALTinterwordspacing
-D.~Fried, A.~Aghajanyan, J.~Lin, S.~Wang, E.~Wallace, F.~Shi, R.~Zhong, W.~tau
-  Yih, L.~Zettlemoyer, and M.~Lewis, ``Incoder: A generative model for code
-  infilling and synthesis,'' 2023. [Online]. Available:
-  \url{https://arxiv.org/abs/2204.05999}
-\BIBentrySTDinterwordspacing
-
 \bibitem{10.1145/3636430}
 \BIBentryALTinterwordspacing
 S.~Tipirneni, M.~Zhu, and C.~K. Reddy, ``Structcoder: Structure-aware
@@ -54,6 +46,14 @@ S.~Tipirneni, M.~Zhu, and C.~K. Reddy, ``Structcoder: Structure-aware
 A.~Vaswani, N.~Shazeer, N.~Parmar, J.~Uszkoreit, L.~Jones, A.~N. Gomez,
   L.~Kaiser, and I.~Polosukhin, ``Attention is all you need,'' 2023. [Online].
   Available: \url{https://arxiv.org/abs/1706.03762}
+\BIBentrySTDinterwordspacing
+
+\bibitem{fried2023incodergenerativemodelcode}
+\BIBentryALTinterwordspacing
+D.~Fried, A.~Aghajanyan, J.~Lin, S.~Wang, E.~Wallace, F.~Shi, R.~Zhong, W.~tau
+  Yih, L.~Zettlemoyer, and M.~Lewis, ``Incoder: A generative model for code
+  infilling and synthesis,'' 2023. [Online]. Available:
+  \url{https://arxiv.org/abs/2204.05999}
 \BIBentrySTDinterwordspacing
 
 \bibitem{feng2020codebertpretrainedmodelprogramming}
